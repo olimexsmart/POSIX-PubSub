@@ -24,6 +24,6 @@ private:
     Subriscriber();
     int FDRequest;
     int FDResponse;
-}
+};
 
 #endif

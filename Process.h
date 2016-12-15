@@ -19,6 +19,6 @@ protected:
 private:
     Process();
     pid_t PID; //Once set this can't be changed
-}
+};
 
 #endif
