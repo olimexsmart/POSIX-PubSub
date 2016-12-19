@@ -12,7 +12,7 @@ class Process
 
 protected:
     //Constructor
-    Process(pid_t PID) { this.PID = PID }
+    Process(pid_t PID) { this->PID = PID; }
     //Proprieties
     pid_t GetPID() { return PID; }
 

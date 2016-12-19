@@ -5,6 +5,10 @@
 #ifndef TOPIC_H
 #define TOPIC_H
 
+#include "Subscriber.h"
+#include "Publisher.h"
+#include <vector>
+
 using namespace std;
 
 class Topic

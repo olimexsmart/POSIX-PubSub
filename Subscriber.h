@@ -5,6 +5,8 @@
 #ifndef SUBSCRIBER_H
 #define SUBSCRIBER_H
 
+#include "Process.h"
+
 using namespace std;
 
 class Subriscriber : public Process
@@ -13,8 +15,8 @@ class Subriscriber : public Process
 public:
     Subriscriber(pid_t PID, int FDRequest, int FDResponse) : Process(PID)
     {
-        this.FDRequest = FDRequest;
-        this.FDResponse = FDResponse;
+        this->FDRequest = FDRequest;
+        this->FDResponse = FDResponse;
     }
 
     int GetFDRequest() { return FDRequest; }

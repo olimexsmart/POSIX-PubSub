@@ -10,8 +10,13 @@ Topic::Topic(pid_t publisherPID, int publisherFDData, int capacity, bool overwri
     //Init of circular buffer parametres
     data = (char *)malloc(sizeof(char) * capacity);
     head = 0;
-    this.capacity = capacity;
+    this->capacity = capacity;
     tails.clear();
+}
+
+Topic::Topic()
+{
+    
 }
 
 Topic::~Topic()
