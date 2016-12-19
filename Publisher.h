@@ -9,14 +9,15 @@
 
 using namespace std;
 
-class Publisher : public Process
-{
+class Publisher : public Process {
+
 public:
     Publisher(pid_t PID, int FDData) : Process(PID) { this->FDData = FDData; }
 
     int GetFDData() { return FDData; }
-
+	
 private:
+	Publisher() { }
     int FDData;
 };
 

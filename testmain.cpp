@@ -15,6 +15,9 @@
 
 int main(int argc, char const *argv[]) {
 
+	printf("Starded\n");
     Topic bsoul(56, 0, 4);
+
+	printf("Ended\n");
     return 0;
 }

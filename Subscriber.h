@@ -21,9 +21,10 @@ public:
 
     int GetFDRequest() { return FDRequest; }
     int GetFDResponse() { return FDResponse; }
-
+	
 private:
-    Subriscriber();
+	Subriscriber() { }
+	
     int FDRequest;
     int FDResponse;
 };

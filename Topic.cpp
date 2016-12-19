@@ -4,9 +4,9 @@
 
 #include "Topic.h"
 
-Topic::Topic(pid_t publisherPID, int publisherFDData, int capacity, bool overwrite = true)
+Topic::Topic(pid_t publisherPID, int publisherFDData, int capacity, bool overwrite /*=true*/)
 {
-    publisher(publisherPID, publisherFDData); //Instance of the publisher of this Topic
+    publisher = new Publisher(publisherPID, publisherFDData); //Instance of the publisher of this Topic
     //Init of circular buffer parametres
     data = (char *)malloc(sizeof(char) * capacity);
     head = 0;
@@ -22,14 +22,16 @@ Topic::Topic()
 Topic::~Topic()
 {
     free(data);
+	delete(publisher);
 }
 
 int Topic::writeCBuffer(char * buffer, int lenght)
 {
-    for(int i = 0; i < lenght; i++)
+	int i;
+    for(i = 0; i < lenght; i++)
     {   //  If not overwriting, stop writing when in frot of you there is a tail pointer
         if(!overwrite)
-            for(int k = 0; k < tails.size(); k++)
+            for(unsigned int k = 0; k < tails.size(); k++)
                 if(tails[k] == ((head + 1) % capacity))
                     return i;
 
@@ -39,7 +41,7 @@ int Topic::writeCBuffer(char * buffer, int lenght)
         head %= capacity;
         //  If overwriting, when superimposing with a tail pointer move it one position away
         if(overwrite)
-            for(int k = 0; k < tails.size(); k++)
+            for(unsigned int k = 0; k < tails.size(); k++)
                 if(head == tails[k])
                     tails[k] = (tails[k] + 1) % capacity;    //Overwrite data dragging them along
     }
@@ -49,13 +51,14 @@ int Topic::writeCBuffer(char * buffer, int lenght)
 
 int Topic::readCBuffer(char * buffer, int lenght, int * tail)
 {   //Valid data are one cell before the head pointer
-    for (int i = 0; i < lenght; i++) {
+	int i;
+    for (i = 0; i < lenght; i++) {
         if(*tail == head)  //We have no more data to read
             return i;
         //  Read and move the tail pointer
         buffer[i] = data[*tail];
-        *tail++;
-        *tail % capacity;
+        (*tail)++;
+        (*tail) %= capacity;
     }
 
     return i;
@@ -72,22 +75,22 @@ void Topic::Subscribe(pid_t subscriberPID, int subscriberFDrequest, int subscrib
 
 void Topic::Unsubscribe(pid_t subscriberPID)
 {
-    for(int k = 0, k < subscribers.size(), k++)
-        if(subscribers[k].GetPID() = subscriberPID)
+    for(unsigned int k = 0; k < subscribers.size(); k++)
+        if(subscribers[k].GetPID() == subscriberPID)
         {
-            subscribers.erase(k);
-            tail.erase(k);
+            subscribers.erase(subscribers.begin() + k);
+            tails.erase(tails.begin() + k);
         }
 }
 
 int Topic::SendData(pid_t subscriberPID)
 {
     //First of all, find the subscriber
-    for(int k = 0, k < subscribers.size(), k++)
-        if(subscribers[k].GetPID() = subscriberPID)
+    for(unsigned int k = 0; k < subscribers.size(); k++)
+        if(subscribers[k].GetPID() == subscriberPID)
         {
             char buffer[capacity];
-            int bytes = readCBuffer(buffer, capacity, tails[k]);
+            int bytes = readCBuffer(buffer, capacity, &tails[k]);
             write(subscribers[k].GetFDResponse(), buffer, bytes);
             return bytes;
         }
@@ -99,7 +102,7 @@ int Topic::TakeData()
 {
     //  If we are here we are sure that data is available to read
     char buffer[capacity];
-    int bytes = read(publisher.GetFDData(), buffer, capacity);
+    int bytes = read(publisher->GetFDData(), buffer, capacity);
     writeCBuffer(buffer, bytes);
     return bytes;
 }

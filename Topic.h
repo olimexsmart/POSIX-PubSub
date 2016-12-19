@@ -8,6 +8,7 @@
 #include "Subscriber.h"
 #include "Publisher.h"
 #include <vector>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -34,7 +35,7 @@ private:
     int readCBuffer(char * buffer, int lenght, int * tail);
 
     //  Connection to Process objects
-    Publisher publisher;
+    Publisher * publisher;
     vector<Subriscriber> subscribers;
     vector<int> tails;
 
