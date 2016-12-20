@@ -16,7 +16,7 @@ Topic::Topic(pid_t publisherPID, int publisherFDData, int capacity, bool overwri
 
 Topic::Topic()
 {
-    
+
 }
 
 Topic::~Topic()
@@ -92,6 +92,7 @@ int Topic::SendData(pid_t subscriberPID)
             char buffer[capacity];
             int bytes = readCBuffer(buffer, capacity, &tails[k]);
             write(subscribers[k].GetFDResponse(), buffer, bytes);
+            kill(subscribers[k].GetPID(), SIGIO); //Signal that I/O is now possible
             return bytes;
         }
 
