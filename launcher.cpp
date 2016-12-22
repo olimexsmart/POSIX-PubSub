@@ -81,15 +81,6 @@ int main(int argc, char const *argv[]) {
 
     printf("LAUNCHER: Names and pipes correctly processed. Starting fork processes\n");
 	printf("INIT: PID: %d\n", getpid());
-    //  ------->    Mediator forking
-    mediator = fork();
-    if(mediator < 0) {
-        perror("Could not fork. Exiting.\n");
-        return -1;
-    } else if(mediator == 0) {
-        printf(ANSI_COLOR_RED "MEDIATOR: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
-
-    }
 
     //  ------->    PublisherA forking
     publisherA = fork();
@@ -98,6 +89,17 @@ int main(int argc, char const *argv[]) {
         return -1;
     } else if(publisherA == 0) {
         printf(ANSI_COLOR_GREEN "PUBLISHER-A: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
+
+        char ** arguments = (char**) malloc(sizeof(char*) * 2);
+        for(int i = 0; i < 2; i ++)
+            arguments[i] = (char*) malloc(sizeof(char) * 15);
+
+        sprintf(arguments[0], "%d", publisherAPipe[1]);
+        sprintf(arguments[1], "%s", argv[6]);   //Inferno.txt
+
+        close(publisherAPipe[0]);
+
+        execvp(publisherAName, arguments);
 
     }
 
@@ -109,6 +111,16 @@ int main(int argc, char const *argv[]) {
     } else if(publisherB == 0) {
         printf(ANSI_COLOR_GREEN "PUBLISHER-B: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
+        char ** arguments = (char**) malloc(sizeof(char*) * 2);
+        for(int i = 0; i < 2; i ++)
+            arguments[i] = (char*) malloc(sizeof(char) * 15);
+
+        sprintf(arguments[0], "%d", publisherBPipe[1]);
+        sprintf(arguments[1], "%s", argv[7]);   //Paradiso.txt
+
+        close(publisherBPipe[0]);
+
+        execvp(publisherBName, arguments);
     }
 
     //  ------->    SubscriberA forking
@@ -119,6 +131,20 @@ int main(int argc, char const *argv[]) {
     } else if(subscriberA == 0) {
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-A: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
+        char ** arguments = (char**) malloc(sizeof(char*) * 5);
+        for(int i = 0; i < 2; i ++)
+            arguments[i] = (char*) malloc(sizeof(char) * 15);
+
+        sprintf(arguments[0], "%d", subscriberAReqPipe[1]);
+        sprintf(arguments[1], "%d", subscriberADataPipe[0]);
+        sprintf(arguments[2], "%s", "Alfa");
+        sprintf(arguments[3], "%d", publisherA);
+        sprintf(arguments[4], "%d", publisherB);
+
+        close(subscriberAReqPipe[0]);
+        close(subscriberADataPipe[1]);
+
+        execvp(subscriberAName, arguments);
     }
 
     //  ------->    SubscriberB forking
@@ -129,6 +155,20 @@ int main(int argc, char const *argv[]) {
     } else if(subscriberB == 0) {
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-B: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
+        char ** arguments = (char**) malloc(sizeof(char*) * 5);
+        for(int i = 0; i < 2; i ++)
+            arguments[i] = (char*) malloc(sizeof(char) * 15);
+
+        sprintf(arguments[0], "%d", subscriberBReqPipe[1]);
+        sprintf(arguments[1], "%d", subscriberBDataPipe[0]);
+        sprintf(arguments[2], "%s", "Bravo");
+        sprintf(arguments[3], "%d", publisherA);
+        sprintf(arguments[4], "%d", publisherB);
+
+        close(subscriberBReqPipe[0]);
+        close(subscriberBDataPipe[1]);
+
+        execvp(subscriberBName, arguments);
     }
 
     //  ------->    SubscriberC forking
@@ -138,6 +178,59 @@ int main(int argc, char const *argv[]) {
         return -1;
     } else if(subscriberC == 0) {
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-C: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
+
+        char ** arguments = (char**) malloc(sizeof(char*) * 5);
+        for(int i = 0; i < 2; i ++)
+            arguments[i] = (char*) malloc(sizeof(char) * 15);
+
+        sprintf(arguments[0], "%d", subscriberCReqPipe[1]);
+        sprintf(arguments[1], "%d", subscriberCDataPipe[0]);
+        sprintf(arguments[2], "%s", "Charlie");
+        sprintf(arguments[3], "%d", publisherA);
+        sprintf(arguments[4], "%d", publisherB);
+
+        close(subscriberCReqPipe[0]);
+        close(subscriberCDataPipe[1]);
+
+        execvp(subscriberCName, arguments);
+    }
+
+    //  ------->    Mediator forking
+    mediator = fork();
+    if(mediator < 0) {
+        perror("Could not fork. Exiting.\n");
+        return -1;
+    } else if(mediator == 0) {
+        printf(ANSI_COLOR_RED "MEDIATOR: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
+
+        char ** arguments = (char**) malloc(sizeof(char*) * 13);
+        for(int i = 0; i < 13; i ++)
+            arguments[i] = (char*) malloc(sizeof(char) * 12);
+
+        sprintf(arguments[0], "%d", publisherA);
+        sprintf(arguments[1], "%d", publisherAPipe[0]);
+        sprintf(arguments[2], "%d", publisherB);
+        sprintf(arguments[3], "%d", publisherBPipe[0]);
+        sprintf(arguments[4], "%d", subscriberA);
+        sprintf(arguments[5], "%d", subscriberAReqPipe[0]);
+        sprintf(arguments[6], "%d", subscriberADataPipe[1]);
+        sprintf(arguments[7], "%d", subscriberB);
+        sprintf(arguments[8], "%d", subscriberBReqPipe[0]);
+        sprintf(arguments[9], "%d", subscriberBDataPipe[1]);
+        sprintf(arguments[10], "%d", subscriberC);
+        sprintf(arguments[11], "%d", subscriberCReqPipe[0]);
+        sprintf(arguments[12], "%d", subscriberCDataPipe[1]);
+        //  Closing unnecessary ends
+        close(publisherAPipe[1]);
+        close(publisherBPipe[1]);
+        close(subscriberADataPipe[0]);
+        close(subscriberBDataPipe[0]);
+        close(subscriberCDataPipe[0]);
+        close(subscriberAReqPipe[1]);
+        close(subscriberBReqPipe[1]);
+        close(subscriberCReqPipe[1]);
+
+        execvp(mediatorName, arguments);
 
     }
 
@@ -150,7 +243,7 @@ int main(int argc, char const *argv[]) {
     wait(&status);
     wait(&status);
     //TODO: IF MEDIATOR FAILS, CLOSE ALL CHILDS
-    
+
     printf("LAUNCHER: All child processes terminated, exiting myself. See you soon. \n");
     return 0;
 }

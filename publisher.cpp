@@ -46,6 +46,9 @@ int main(int argc, char const *argv[]) {
     }
 
     fclose(file);
+    // for(int i = 0; i < argc; i++)
+    //     free(argv[i]);
+    // free(argv);
 
     printf(ANSI_COLOR_GREEN "PUBLISHER-%s: Reached end of the file. Exiting.\n" ANSI_COLOR_RESET, argv[1]);
 

@@ -64,6 +64,9 @@ int main(int argc, char const *argv[]) {
 
 
     free(topics);
+    // for(int i = 0; i < argc; i++)
+    //     free(argv[i]);
+    // free(argv);
 
     return 0;
 }
