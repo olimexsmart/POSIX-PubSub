@@ -31,8 +31,8 @@ int main(int argc, char const *argv[]) {
         name of the launcher itself, 7 in total.
     */
     if(argc != 7) {
-        printf("The convention here is to use the first input argument
-        as the mediator executable. Then the two publishers and at the and the
+        printf("The convention here is to use the first input argument\
+        as the mediator executable. Then the two publishers and at the and the\
         three subscribers.\n");
         return -1;
     }
@@ -69,7 +69,7 @@ int main(int argc, char const *argv[]) {
     int subscriberCReqPipe[2];
     if( pipe(publisherAPipe) == -1 || pipe(publisherBPipe) == -1 || pipe(subscriberCReqPipe) == -1 ||
         pipe(subscriberAReqPipe) == -1 || pipe(subscriberBReqPipe) == -1 ||pipe(subscriberCDataPipe) == -1 ||
-        pipe(subscriberADataPipe) == -1 || pipe(subscriberBDataPipe) == -1 ||) {
+        pipe(subscriberADataPipe) == -1 || pipe(subscriberBDataPipe) == -1) {
         perror("Could not open all the necessary pipes. Exiting.\n");
         return -1;
     }
@@ -142,13 +142,15 @@ int main(int argc, char const *argv[]) {
     }
 
     //  Six waits ensure that this process terminater when all of them exit
-    wait();
-    wait();
-    wait();
-    wait();
-    wait();
-    wait();
-
+    int status;
+    wait(&status);
+    wait(&status);
+    wait(&status);
+    wait(&status);
+    wait(&status);
+    wait(&status);
+    //TODO: IF MEDIATOR FAILS, CLOSE ALL CHILDS
+    
     printf("LAUNCHER: All child processes terminated, exiting myself. See you soon. \n");
     return 0;
 }

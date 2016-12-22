@@ -6,6 +6,7 @@
 */
 
 #include <sys/types.h>
+#include <sys/signal.h>
 #include <sys/wait.h>
 #include <sys/select.h>
 #include <unistd.h>
@@ -18,12 +19,11 @@
 #include "Topic.h"
 
 #define ANSI_COLOR_RED     "\x1b[1;31m"
-#define ANSI_COLOR_GREEN   "\x1b[1;32m"
-#define ANSI_COLOR_YELLOW  "\x1b[1;33m"
-#define ANSI_COLOR_BLUE    "\x1b[1;34m"
-#define ANSI_COLOR_MAGENTA "\x1b[1;35m"
-#define ANSI_COLOR_CYAN    "\x1b[1;36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
+
+//  Very case-specific function to avoid code repetition and readbility
+int HandleRequest(pid_t subscriberPID, int subscriberReqPipe, Topic * inferno, Topic * paradiso);
+
 
 int main(int argc, char const *argv[]) {
     /*

@@ -16,6 +16,9 @@
 #include <time.h>
 #include <string.h>
 
+#define ANSI_COLOR_GREEN   "\x1b[1;32m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 int main(int argc, char const *argv[]) {
 
     if(argc != 2) {

@@ -26,7 +26,7 @@ Topic::~Topic()
 	delete(publisher);
 }
 
-Topic::pid_t GetPublisherPID()
+pid_t Topic::GetPublisherPID()
 {
     return publisher->GetPID();
 }

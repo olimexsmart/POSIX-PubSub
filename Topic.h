@@ -9,6 +9,8 @@
 #include "Publisher.h"
 #include <vector>
 #include <stdlib.h>
+#include <sys/signal.h>
+#include <sys/types.h>
 
 using namespace std;
 
