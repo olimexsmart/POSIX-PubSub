@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/select.h>
+#include <sys/time.h>
 #include <sys/signal.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -29,36 +30,39 @@ void HandleSIGIO(int signal);
 
 //  Some global vars used into the HandleSIGIO function
 int receiveFD;
-const char * subscriberName;
 
 int main(int argc, char const *argv[]) {
+
+    printf(ANSI_COLOR_BLUE "SUBSCRIBER: Starting...\n" ANSI_COLOR_RESET);
 
     if(argc < 4) {  //  At least one publisher
         printf(ANSI_COLOR_BLUE "SUBSCRIBER: Number of arguments not correct.\n" ANSI_COLOR_RESET);
         return -1;
     }
 
-    time_t t;
-    srand((unsigned) time(&t));
-    int Ntopics = argc - 3;
+    struct timeval time;
+    gettimeofday(&time,NULL);
+    srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
+    int Ntopics = argc - 2;
     int requestFD = atoi(argv[0]);
     receiveFD = atoi(argv[1]);
-    subscriberName = argv[2];  //  Arg[2] contains the name assigned to this subscriber
     int * topics = (int *) malloc(sizeof(int) * Ntopics); // Holds the list of topics we are subscribed to
     for(int i = 0; i < Ntopics; i++)
-        topics[i] = atoi(argv[i + 3]);
+        topics[i] = atoi(argv[i + 2]);
 
-    char buffer[5] = "";    //  Buffer that will contain the PID of the publisher we want to make to
+    char buffer[6] = "";    //  Buffer that will contain the PID of the publisher we want to make to
 
     //  IRQ attach
     signal(SIGIO, HandleSIGIO);
 
-    printf(ANSI_COLOR_BLUE "SUBSCRIBER-%s: Started sending requests.\n" ANSI_COLOR_RESET, argv[2]);
+    sleep(5); //Wait until mediator is ok
+
+    printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Started sending requests.\n" ANSI_COLOR_RESET, getpid());
 
     while (true) {
         sprintf(buffer, "%d", topics[rand() % Ntopics]);    //  Put request PID into the buffer
-        int n = write(requestFD, buffer, 5);
-        printf(ANSI_COLOR_BLUE "SUBSCRIBER-%s: Sent request->%s to %s.\n" ANSI_COLOR_RESET, argv[2], (n == 5) ? "OK" : "FAILED", buffer);
+        int n = write(requestFD, buffer, 6);
+        printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Sent request->%s to %s.\n" ANSI_COLOR_RESET, getpid(), (n == 6) ? "OK" : "FAILED", buffer);
         sleep(rand() % 3);  //  Take a breath
     }
 
@@ -75,9 +79,10 @@ int main(int argc, char const *argv[]) {
 void HandleSIGIO(int signal)
 {
     if(signal == SIGIO) {
+        char senderPID[6] = "";
+        read(receiveFD, senderPID, 6);
         char buffer[256];
         read(receiveFD, buffer, 256);
-        //  TODO: ADD PREAMBLE THAT CARRIES SENDERE INFORMATION AND UNPACK IT HERE.
-        printf(ANSI_COLOR_BLUE "SUBSCRIBER-%s: Received data: %s.\n" ANSI_COLOR_RESET, subscriberName, buffer);
+        printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Received data from %s: \n%s\n" ANSI_COLOR_RESET, getpid(), senderPID, buffer);
     }
 }

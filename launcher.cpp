@@ -30,10 +30,8 @@ int main(int argc, char const *argv[]) {
         three subscribers. The arguments number has to be  6 plus the
         name of the launcher itself, 7 in total.
     */
-    if(argc != 7) {
-        printf("The convention here is to use the first input argument\
-        as the mediator executable. Then the two publishers and at the and the\
-        three subscribers.\n");
+    if(argc != 9) {
+        printf("The convention here is to use the first input argument as the mediator executable. Then the two publishers, the mediator and at the and the three subscribers, then followed by the two text file names.\n");
         return -1;
     }
 
@@ -80,7 +78,7 @@ int main(int argc, char const *argv[]) {
     */
 
     printf("LAUNCHER: Names and pipes correctly processed. Starting fork processes\n");
-	printf("INIT: PID: %d\n", getpid());
+	printf("LAUNCHER: PID: %d\n", getpid());
 
     //  ------->    PublisherA forking
     publisherA = fork();
@@ -90,12 +88,13 @@ int main(int argc, char const *argv[]) {
     } else if(publisherA == 0) {
         printf(ANSI_COLOR_GREEN "PUBLISHER-A: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
-        char ** arguments = (char**) malloc(sizeof(char*) * 2);
+        char ** arguments = (char**) malloc(sizeof(char*) * 3);
         for(int i = 0; i < 2; i ++)
             arguments[i] = (char*) malloc(sizeof(char) * 15);
+        arguments[2] = NULL;
 
         sprintf(arguments[0], "%d", publisherAPipe[1]);
-        sprintf(arguments[1], "%s", argv[6]);   //Inferno.txt
+        sprintf(arguments[1], "%s", argv[7]);   //Inferno.txt
 
         close(publisherAPipe[0]);
 
@@ -111,12 +110,13 @@ int main(int argc, char const *argv[]) {
     } else if(publisherB == 0) {
         printf(ANSI_COLOR_GREEN "PUBLISHER-B: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
-        char ** arguments = (char**) malloc(sizeof(char*) * 2);
+        char ** arguments = (char**) malloc(sizeof(char*) * 3);
         for(int i = 0; i < 2; i ++)
             arguments[i] = (char*) malloc(sizeof(char) * 15);
+        arguments[2] = NULL;
 
         sprintf(arguments[0], "%d", publisherBPipe[1]);
-        sprintf(arguments[1], "%s", argv[7]);   //Paradiso.txt
+        sprintf(arguments[1], "%s", argv[8]);   //Paradiso.txt
 
         close(publisherBPipe[0]);
 
@@ -132,18 +132,19 @@ int main(int argc, char const *argv[]) {
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-A: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
         char ** arguments = (char**) malloc(sizeof(char*) * 5);
-        for(int i = 0; i < 2; i ++)
+        for(int i = 0; i < 4; i ++)
             arguments[i] = (char*) malloc(sizeof(char) * 15);
+        arguments[4] = NULL;
 
         sprintf(arguments[0], "%d", subscriberAReqPipe[1]);
         sprintf(arguments[1], "%d", subscriberADataPipe[0]);
-        sprintf(arguments[2], "%s", "Alfa");
-        sprintf(arguments[3], "%d", publisherA);
-        sprintf(arguments[4], "%d", publisherB);
+        sprintf(arguments[2], "%d", publisherA);
+        sprintf(arguments[3], "%d", publisherB);
 
         close(subscriberAReqPipe[0]);
         close(subscriberADataPipe[1]);
 
+        printf(ANSI_COLOR_BLUE "SUBSCRIBER-A: Ready to execvp.\n" ANSI_COLOR_RESET);
         execvp(subscriberAName, arguments);
     }
 
@@ -156,18 +157,19 @@ int main(int argc, char const *argv[]) {
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-B: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
         char ** arguments = (char**) malloc(sizeof(char*) * 5);
-        for(int i = 0; i < 2; i ++)
+        for(int i = 0; i < 4; i ++)
             arguments[i] = (char*) malloc(sizeof(char) * 15);
+        arguments[4] = NULL;
 
         sprintf(arguments[0], "%d", subscriberBReqPipe[1]);
         sprintf(arguments[1], "%d", subscriberBDataPipe[0]);
-        sprintf(arguments[2], "%s", "Bravo");
-        sprintf(arguments[3], "%d", publisherA);
-        sprintf(arguments[4], "%d", publisherB);
+        sprintf(arguments[2], "%d", publisherA);
+        sprintf(arguments[3], "%d", publisherB);
 
         close(subscriberBReqPipe[0]);
         close(subscriberBDataPipe[1]);
 
+        printf(ANSI_COLOR_BLUE "SUBSCRIBER-B: Ready to execvp.\n" ANSI_COLOR_RESET);
         execvp(subscriberBName, arguments);
     }
 
@@ -180,18 +182,19 @@ int main(int argc, char const *argv[]) {
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-C: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
         char ** arguments = (char**) malloc(sizeof(char*) * 5);
-        for(int i = 0; i < 2; i ++)
+        for(int i = 0; i < 4; i ++)
             arguments[i] = (char*) malloc(sizeof(char) * 15);
+        arguments[4] = NULL;
 
         sprintf(arguments[0], "%d", subscriberCReqPipe[1]);
         sprintf(arguments[1], "%d", subscriberCDataPipe[0]);
-        sprintf(arguments[2], "%s", "Charlie");
-        sprintf(arguments[3], "%d", publisherA);
-        sprintf(arguments[4], "%d", publisherB);
+        sprintf(arguments[2], "%d", publisherA);
+        sprintf(arguments[3], "%d", publisherB);
 
         close(subscriberCReqPipe[0]);
         close(subscriberCDataPipe[1]);
 
+        printf(ANSI_COLOR_BLUE "SUBSCRIBER-C: Ready to execvp.\n" ANSI_COLOR_RESET);
         execvp(subscriberCName, arguments);
     }
 
@@ -203,9 +206,10 @@ int main(int argc, char const *argv[]) {
     } else if(mediator == 0) {
         printf(ANSI_COLOR_RED "MEDIATOR: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
-        char ** arguments = (char**) malloc(sizeof(char*) * 13);
+        char ** arguments = (char**) malloc(sizeof(char*) * 14);
         for(int i = 0; i < 13; i ++)
             arguments[i] = (char*) malloc(sizeof(char) * 12);
+        arguments[13] = NULL;
 
         sprintf(arguments[0], "%d", publisherA);
         sprintf(arguments[1], "%d", publisherAPipe[0]);
@@ -230,20 +234,20 @@ int main(int argc, char const *argv[]) {
         close(subscriberBReqPipe[1]);
         close(subscriberCReqPipe[1]);
 
+        printf(ANSI_COLOR_RED "MEDIATOR: Ready to execvp(%s).\n" ANSI_COLOR_RESET, mediatorName);
         execvp(mediatorName, arguments);
-
     }
 
     //  Six waits ensure that this process terminater when all of them exit
     int status;
-    wait(&status);
-    wait(&status);
-    wait(&status);
-    wait(&status);
-    wait(&status);
-    wait(&status);
+    waitpid(subscriberA, &status, 0);
+    waitpid(subscriberB, &status, 0);
+    waitpid(subscriberC, &status, 0);
+    waitpid(publisherA, &status, 0);
+    waitpid(publisherB, &status, 0);
+    waitpid(mediator, &status, 0);
     //TODO: IF MEDIATOR FAILS, CLOSE ALL CHILDS
 
-    printf("LAUNCHER: All child processes terminated, exiting myself. See you soon. \n");
+    printf("LAUNCHER: All child processes terminated, exiting myself(%d). See you soon. \n", getpid());
     return 0;
 }

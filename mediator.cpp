@@ -33,10 +33,14 @@ int main(int argc, char const *argv[]) {
         This was not the goal of the assignement, but with come conventions
         it can be made without great expense.
     */
+    printf(ANSI_COLOR_RED "MEDIATOR: Starting...\n" ANSI_COLOR_RESET);
+
     if(argc != 13) {
         printf(ANSI_COLOR_RED "MEDIATOR: Not enough arguments for hard-coded initialization\n" ANSI_COLOR_RESET);
         return -1;
     }
+
+    printf(ANSI_COLOR_RED "MEDIATOR: Preparing structures.\n" ANSI_COLOR_RESET);
     //  Stuff for publisherA
     //  publisherAPID, publisherAFDData
     Topic Inferno(atoi(argv[0]), atoi(argv[1]), 1024);
@@ -76,6 +80,7 @@ int main(int argc, char const *argv[]) {
         FD_SET(atoi(argv[8]), &rfds);
         FD_SET(atoi(argv[11]), &rfds);
 
+        printf(ANSI_COLOR_RED "MEDIATOR: Entering in select.\n" ANSI_COLOR_RESET);
         select(nfds, &rfds, NULL, NULL, NULL);
         printf(ANSI_COLOR_RED "MEDIATOR: Some data received.\n" ANSI_COLOR_RESET);
 
@@ -131,9 +136,9 @@ int main(int argc, char const *argv[]) {
 int HandleRequest(pid_t subscriberPID, int subscriberReqPipe, Topic * inferno, Topic * paradiso)
 {
     //  Getting Topic's PID
-    char buffer[5] = "";
+    char buffer[6] = "";
     pid_t request;
-    read(subscriberReqPipe, buffer, 5);
+    read(subscriberReqPipe, buffer, 6);
     request = atoi(buffer);
 
     if(inferno->GetPublisherPID() == request)

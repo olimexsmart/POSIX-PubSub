@@ -12,6 +12,10 @@
 #include <sys/signal.h>
 #include <sys/types.h>
 
+#include <stdio.h> //   Debug purpose
+#define ANSI_COLOR_CYAN    "\x1b[1;36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 using namespace std;
 
 class Topic
