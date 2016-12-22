@@ -15,6 +15,14 @@
 #include <time.h>
 #include <string.h>
 
+#define ANSI_COLOR_RED     "\x1b[1;31m"
+#define ANSI_COLOR_GREEN   "\x1b[1;32m"
+#define ANSI_COLOR_YELLOW  "\x1b[1;33m"
+#define ANSI_COLOR_BLUE    "\x1b[1;34m"
+#define ANSI_COLOR_MAGENTA "\x1b[1;35m"
+#define ANSI_COLOR_CYAN    "\x1b[1;36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 int main(int argc, char const *argv[]) {
     /*
         The convention here is to use the first input argument
@@ -71,8 +79,76 @@ int main(int argc, char const *argv[]) {
         then start the scheleton of the forking process
     */
 
+    printf("LAUNCHER: Names and pipes correctly processed. Starting fork processes\n");
+	printf("INIT: PID: %d\n", getpid());
+    //  ------->    Mediator forking
+    mediator = fork();
+    if(mediator < 0) {
+        perror("Could not fork. Exiting.\n");
+        return -1;
+    } else if(mediator == 0) {
+        printf(ANSI_COLOR_RED "MEDIATOR: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
+    }
 
+    //  ------->    PublisherA forking
+    publisherA = fork();
+    if(publisherA < 0) {
+        perror("Could not fork. Exiting.\n");
+        return -1;
+    } else if(publisherA == 0) {
+        printf(ANSI_COLOR_GREEN "PUBLISHER-A: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
 
+    }
+
+    //  ------->    PublisherB forking
+    publisherB = fork();
+    if(publisherB< 0) {
+        perror("Could not fork. Exiting.\n");
+        return -1;
+    } else if(publisherB == 0) {
+        printf(ANSI_COLOR_GREEN "PUBLISHER-B: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
+
+    }
+
+    //  ------->    SubscriberA forking
+    subscriberA = fork();
+    if(subscriberA < 0) {
+        perror("Could not fork. Exiting.\n");
+        return -1;
+    } else if(subscriberA == 0) {
+        printf(ANSI_COLOR_BLUE "SUBSCRIBER-A: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
+
+    }
+
+    //  ------->    SubscriberB forking
+    subscriberB = fork();
+    if(subscriberB < 0) {
+        perror("Could not fork. Exiting.\n");
+        return -1;
+    } else if(subscriberB == 0) {
+        printf(ANSI_COLOR_BLUE "SUBSCRIBER-B: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
+
+    }
+
+    //  ------->    SubscriberC forking
+    subscriberC = fork();
+    if(subscriberC < 0) {
+        perror("Could not fork. Exiting.\n");
+        return -1;
+    } else if(subscriberC == 0) {
+        printf(ANSI_COLOR_BLUE "SUBSCRIBER-C: Forked correctly, PID: %d. Getting argv ready to exec.\n" ANSI_COLOR_RESET, getpid());
+
+    }
+
+    //  Six waits ensure that this process terminater when all of them exit
+    wait();
+    wait();
+    wait();
+    wait();
+    wait();
+    wait();
+
+    printf("LAUNCHER: All child processes terminated, exiting myself. See you soon. \n");
     return 0;
 }

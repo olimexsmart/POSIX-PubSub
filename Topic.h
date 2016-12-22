@@ -22,6 +22,8 @@ public:
     int TakeData();
     int SendData(pid_t subscriberPID);
 
+    pid_t GetPublisherPID();
+
     ~Topic();
 
 private:

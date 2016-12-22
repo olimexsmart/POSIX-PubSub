@@ -11,6 +11,7 @@ Topic::Topic(pid_t publisherPID, int publisherFDData, int capacity, bool overwri
     data = (char *)malloc(sizeof(char) * capacity);
     head = 0;
     this->capacity = capacity;
+    this->overwrite = overwrite;
     tails.clear();
 }
 
@@ -23,6 +24,11 @@ Topic::~Topic()
 {
     free(data);
 	delete(publisher);
+}
+
+Topic::pid_t GetPublisherPID()
+{
+    return publisher->GetPID();
 }
 
 int Topic::writeCBuffer(char * buffer, int lenght)
