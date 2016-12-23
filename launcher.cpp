@@ -241,14 +241,18 @@ int main(int argc, char const *argv[]) {
 
     //  Six waits ensure that this process terminater when all of them exit
     int status;
-    waitpid(subscriberA, &status, 0);
-    waitpid(subscriberB, &status, 0);
-    waitpid(subscriberC, &status, 0);
     waitpid(publisherA, &status, 0);
     waitpid(publisherB, &status, 0);
-    waitpid(mediator, &status, 0);
+    kill(subscriberA, SIGKILL);
+    kill(subscriberB, SIGKILL);
+    kill(subscriberC, SIGKILL);
+    kill(mediator, SIGKILL);
+    // waitpid(subscriberA, &status, 0);
+    // waitpid(subscriberB, &status, 0);
+    // waitpid(subscriberC, &status, 0);
+    // waitpid(mediator, &status, 0);
     //TODO: IF MEDIATOR FAILS, CLOSE ALL CHILDS
 
-    printf("LAUNCHER: All child processes terminated, exiting myself(%d). See you soon. \n", getpid());
+    printf("LAUNCHER: All child processes terminated, exiting myself(%d).\n Should have been generated six files with the same content of the input ones.\n See you soon. \n", getpid());
     return 0;
 }

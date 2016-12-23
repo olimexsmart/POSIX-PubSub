@@ -48,8 +48,10 @@ int Topic::writeCBuffer(char * buffer, int lenght)
         //  If overwriting, when superimposing with a tail pointer move it one position away
         if(overwrite)
             for(unsigned int k = 0; k < tails.size(); k++)
-                if(head == tails[k])
+                if(head == tails[k]) {
                     tails[k] = (tails[k] + 1) % capacity;    //Overwrite data dragging them along
+                    printf(ANSI_COLOR_CYAN "TOPIC-%d: Overwriting data of %d #########################################.\n" ANSI_COLOR_RESET, this->GetPublisherPID(), subscribers[k].GetPID());
+                }
     }
     return i;
 }
@@ -76,8 +78,6 @@ void Topic::Subscribe(pid_t subscriberPID, int subscriberFDrequest, int subscrib
     Subriscriber s(subscriberPID, subscriberFDrequest, subscriberFDresponse);
     subscribers.push_back(s);   //Copy it at the end of the array
     tails.push_back(head);      //For a new subscriber consider valid data only from now on
-
-
 }
 
 void Topic::Unsubscribe(pid_t subscriberPID)

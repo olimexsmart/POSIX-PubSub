@@ -71,7 +71,7 @@ int main(int argc, char const *argv[]) {
     gettimeofday(&time,NULL);
     srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
 
-    sleep(3); //Wait until mediator is ok
+    sleep(2); //Wait until mediator is ok
 
     //  Main loop
     printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Started sending requests.\n" ANSI_COLOR_RESET, getpid());
@@ -79,7 +79,13 @@ int main(int argc, char const *argv[]) {
         sprintf(buffer, "%d", topics[rand() % Ntopics]);    //  Put request PID into the buffer
         int n = write(requestFD, buffer, 6);
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Sent request->%s to %s.\n" ANSI_COLOR_RESET, getpid(), (n == 6) ? "OK" : "FAILED", buffer);
-        sleep(rand() % 2 + 1);  //  Take a breath
+
+        //  Take a breath
+        struct timespec t, to;
+        t.tv_sec = 0;
+        t.tv_nsec = (rand() % 75) * 1000000 + 1;
+        nanosleep(&t, &to);
+        nanosleep(&to, NULL); // In case the pause got interrupted
     }
 
 
@@ -94,12 +100,18 @@ int main(int argc, char const *argv[]) {
 
 void HandleSIGIO(int signal)
 {
+    //  Block SIGIO until finished
+    sigset_t sigset;
+    sigemptyset(&sigset);
+    sigaddset(&sigset, SIGIO);
+    sigprocmask(SIG_BLOCK, &sigset, NULL);
+
     if(signal == SIGIO) {
         //Actual reading, splitting the data in substring since there could be a double entry
         char buffer[1024] = {'\0'};
 
         int bytesRead = read(receiveFD, buffer, 1023);
-        if(bytesRead <= 6) return; //Should at least carry one char
+        //if(bytesRead <= 6) return; //Should at least carry one char
 
         char senderPID[6] = "";
         strncpy(senderPID, buffer, 5);
@@ -119,4 +131,9 @@ void HandleSIGIO(int signal)
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Received %d bytes from %s.\n" ANSI_COLOR_RESET, getpid(), bytesRead - 6, senderPID);
 
     }
+
+    //UNBLOCK SIGIO
+    sigemptyset(&sigset);
+    sigaddset(&sigset, SIGIO);
+    sigprocmask(SIG_UNBLOCK, &sigset, NULL);
 }

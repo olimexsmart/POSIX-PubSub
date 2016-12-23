@@ -48,7 +48,11 @@ int main(int argc, char const *argv[]) {
     while (fgets(line, sizeof(line), file)) {
         int n = write(writingPipe, line, strlen(line));
         printf(ANSI_COLOR_GREEN "PUBLISHER-%d: Wrote %d characters.\n" ANSI_COLOR_RESET, getpid(), n);
-        sleep(rand() % 2 + 1); //   Sleep for some random time, between 0 and 5 seconds
+
+        struct timespec t;
+        t.tv_sec = 0;
+        t.tv_nsec = (rand() % 100) * 1000000 + 1;
+        nanosleep(&t, NULL);
     }
 
     fclose(file);
