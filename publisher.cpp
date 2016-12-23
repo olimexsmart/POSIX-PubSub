@@ -31,7 +31,7 @@ int main(int argc, char const *argv[]) {
     int writingPipe = atoi(argv[0]);
     char const* const fileName = argv[1];
     char line[256];
-
+    //  Trying to have a finer seed
     struct timeval time;
     gettimeofday(&time,NULL);
     srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
@@ -48,7 +48,7 @@ int main(int argc, char const *argv[]) {
     while (fgets(line, sizeof(line), file)) {
         int n = write(writingPipe, line, strlen(line));
         printf(ANSI_COLOR_GREEN "PUBLISHER-%d: Wrote %d characters.\n" ANSI_COLOR_RESET, getpid(), n);
-        sleep(rand() % 2); //   Sleep for some random time, between 0 and 5 seconds
+        sleep(rand() % 2 + 1); //   Sleep for some random time, between 0 and 5 seconds
     }
 
     fclose(file);

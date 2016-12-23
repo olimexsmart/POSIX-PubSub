@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <fcntl.h>
 #include <stdlib.h>
 
 #include <time.h>
@@ -65,9 +66,9 @@ int main(int argc, char const *argv[]) {
     int subscriberBReqPipe[2];
     int subscriberCDataPipe[2];
     int subscriberCReqPipe[2];
-    if( pipe(publisherAPipe) == -1 || pipe(publisherBPipe) == -1 || pipe(subscriberCReqPipe) == -1 ||
-        pipe(subscriberAReqPipe) == -1 || pipe(subscriberBReqPipe) == -1 ||pipe(subscriberCDataPipe) == -1 ||
-        pipe(subscriberADataPipe) == -1 || pipe(subscriberBDataPipe) == -1) {
+    if( pipe2(publisherAPipe, O_NONBLOCK) == -1 || pipe2(publisherBPipe, O_NONBLOCK) == -1 || pipe2(subscriberCReqPipe, O_NONBLOCK) == -1 ||
+        pipe2(subscriberAReqPipe, O_NONBLOCK) == -1 || pipe2(subscriberBReqPipe, O_NONBLOCK) == -1 || pipe2(subscriberCDataPipe, O_NONBLOCK) == -1 ||
+        pipe2(subscriberADataPipe, O_NONBLOCK) == -1 || pipe2(subscriberBDataPipe, O_NONBLOCK) == -1) {
         perror("Could not open all the necessary pipes. Exiting.\n");
         return -1;
     }

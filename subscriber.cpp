@@ -40,30 +40,46 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
-    struct timeval time;
-    gettimeofday(&time,NULL);
-    srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
-    int Ntopics = argc - 2;
+    //  Just better names and sharing data to the IRQ routine
     int requestFD = atoi(argv[0]);
     receiveFD = atoi(argv[1]);
+    char buffer[6] = "";    //  Buffer that will contain the PID of the publisher we want to make to
+
+    //  Structure that holds all topic information
+    int Ntopics = argc - 2;
     int * topics = (int *) malloc(sizeof(int) * Ntopics); // Holds the list of topics we are subscribed to
-    for(int i = 0; i < Ntopics; i++)
+    for(int i = 0; i < Ntopics; i++) {
         topics[i] = atoi(argv[i + 2]);
 
-    char buffer[6] = "";    //  Buffer that will contain the PID of the publisher we want to make to
+        //  Create empty files were the data will be written
+        FILE *fp;
+        char filename[30];
+        sprintf(filename, "Subscriber-%d - From %d.data", getpid(), topics[i]);
+        fp = fopen (filename, "w");
+        if (fp!=NULL)
+        {
+            fprintf(fp,"%s\n\n", filename);
+            fclose (fp);
+        }
+    }
 
     //  IRQ attach
     signal(SIGIO, HandleSIGIO);
 
-    sleep(5); //Wait until mediator is ok
+    //  More random seed
+    struct timeval time;
+    gettimeofday(&time,NULL);
+    srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
 
+    sleep(3); //Wait until mediator is ok
+
+    //  Main loop
     printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Started sending requests.\n" ANSI_COLOR_RESET, getpid());
-
     while (true) {
         sprintf(buffer, "%d", topics[rand() % Ntopics]);    //  Put request PID into the buffer
         int n = write(requestFD, buffer, 6);
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Sent request->%s to %s.\n" ANSI_COLOR_RESET, getpid(), (n == 6) ? "OK" : "FAILED", buffer);
-        sleep(rand() % 3);  //  Take a breath
+        sleep(rand() % 2 + 1);  //  Take a breath
     }
 
 
@@ -79,10 +95,28 @@ int main(int argc, char const *argv[]) {
 void HandleSIGIO(int signal)
 {
     if(signal == SIGIO) {
+        //Actual reading, splitting the data in substring since there could be a double entry
+        char buffer[1024] = {'\0'};
+
+        int bytesRead = read(receiveFD, buffer, 1023);
+        if(bytesRead <= 6) return; //Should at least carry one char
+
         char senderPID[6] = "";
-        read(receiveFD, senderPID, 6);
-        char buffer[256];
-        read(receiveFD, buffer, 256);
-        printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Received data from %s: \n%s\n" ANSI_COLOR_RESET, getpid(), senderPID, buffer);
+        strncpy(senderPID, buffer, 5);
+        senderPID[5] = '\0';
+
+        //Writing the data on file
+        FILE *fp;
+        char filename[35];
+        sprintf(filename, "Subscriber-%d - From %s.data", getpid(), senderPID);
+        fp = fopen (filename, "a");     //  Append writing mode
+        if (fp!=NULL)
+        {
+            fprintf(fp,"%s", buffer + 6);   //  Avoiding the first 6 characters wich are the preamble
+            fclose (fp);
+        }
+
+        printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Received %d bytes from %s.\n" ANSI_COLOR_RESET, getpid(), bytesRead - 6, senderPID);
+
     }
 }

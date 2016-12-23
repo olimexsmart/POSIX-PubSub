@@ -77,6 +77,7 @@ void Topic::Subscribe(pid_t subscriberPID, int subscriberFDrequest, int subscrib
     subscribers.push_back(s);   //Copy it at the end of the array
     tails.push_back(head);      //For a new subscriber consider valid data only from now on
 
+
 }
 
 void Topic::Unsubscribe(pid_t subscriberPID)
@@ -96,22 +97,22 @@ int Topic::SendData(pid_t subscriberPID)
         if(subscribers[k].GetPID() == subscriberPID)
         {
             char buffer[capacity];
-            printf(ANSI_COLOR_CYAN "TOPIC-%d: Tail of %d at %d before reading.\n" ANSI_COLOR_RESET, this->GetPublisherPID(), subscribers[k].GetPID(), tails[k]);
+            //printf(ANSI_COLOR_CYAN "TOPIC-%d: Tail of %d at %d before reading.\n" ANSI_COLOR_RESET, this->GetPublisherPID(), subscribers[k].GetPID(), tails[k]);
             int bytes = readCBuffer(buffer, capacity, &tails[k]);
-            printf(ANSI_COLOR_CYAN "TOPIC-%d: Tail of %d at %d after reading.\n" ANSI_COLOR_RESET, this->GetPublisherPID(), subscribers[k].GetPID(), tails[k]);
+            //printf(ANSI_COLOR_CYAN "TOPIC-%d: Tail of %d at %d after reading.\n" ANSI_COLOR_RESET, this->GetPublisherPID(), subscribers[k].GetPID(), tails[k]);
 
             if(bytes != 0) {
                 //  Sending premble with the sender's PID
                 char senderPID[6] = "";
-                sprintf(senderPID, "%d", this->GetPublisherPID());
+                sprintf(senderPID, "%d", this->GetPublisherPID()); //  Special sign for segmentation
                 write(subscribers[k].GetFDResponse(), senderPID, 6);
                 //  Sending the actual data
                 write(subscribers[k].GetFDResponse(), buffer, bytes);
                 kill(subscribers[k].GetPID(), SIGIO); //Signal that I/O is now possible
-                printf(ANSI_COLOR_CYAN "TOPIC-%d: Sent %d chars to %d.\n" ANSI_COLOR_RESET, this->GetPublisherPID(), bytes, subscribers[k].GetPID());
+                //printf(ANSI_COLOR_CYAN "TOPIC-%d: Sent %d chars to %d.\n" ANSI_COLOR_RESET, this->GetPublisherPID(), bytes, subscribers[k].GetPID());
                 return bytes;
             } else {
-                printf(ANSI_COLOR_CYAN "TOPIC-%d: Nothing to send to %d.\n" ANSI_COLOR_RESET, this->GetPublisherPID(), subscribers[k].GetPID());
+                //printf(ANSI_COLOR_CYAN "TOPIC-%d: Nothing to send to %d.\n" ANSI_COLOR_RESET, this->GetPublisherPID(), subscribers[k].GetPID());
                 return 0;
             }
         }
@@ -125,6 +126,6 @@ int Topic::TakeData()
     char buffer[capacity];
     int bytes = read(publisher->GetFDData(), buffer, capacity);
     writeCBuffer(buffer, bytes);
-    printf(ANSI_COLOR_CYAN "TOPIC-%d: Received %d chars\n" ANSI_COLOR_RESET, this->GetPublisherPID(), bytes);
+    //printf(ANSI_COLOR_CYAN "TOPIC-%d: Received %d chars\n" ANSI_COLOR_RESET, this->GetPublisherPID(), bytes);
     return bytes;
 }

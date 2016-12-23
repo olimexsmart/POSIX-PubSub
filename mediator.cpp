@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #include <time.h>
 #include <string.h>
 
@@ -100,27 +101,32 @@ int main(int argc, char const *argv[]) {
 
         //  Get publisherA data
         if(FD_ISSET(atoi(argv[1]), &rfds)) {
-            Inferno.TakeData();
+            int n = Inferno.TakeData();
+            printf(ANSI_COLOR_RED "MEDIATOR: Received %d bytes from Publisher-%d.\n" ANSI_COLOR_RESET, n, Inferno.GetPublisherPID());
         }
 
         //  Get publisherB data
         if(FD_ISSET(atoi(argv[3]), &rfds)) {
-            Paradiso.TakeData();
+            int n = Paradiso.TakeData();
+            printf(ANSI_COLOR_RED "MEDIATOR: Received %d bytes from Publisher-%d.\n" ANSI_COLOR_RESET, n, Paradiso.GetPublisherPID());
         }
 
         //  Get subscriberA request and send to it the data
         if(FD_ISSET(atoi(argv[5]), &rfds)) {
-            HandleRequest(atoi(argv[4]), atoi(argv[5]), &Inferno, &Paradiso);
+            int n = HandleRequest(atoi(argv[4]), atoi(argv[5]), &Inferno, &Paradiso);
+            printf(ANSI_COLOR_RED "MEDIATOR: Sent %d bytes to Subscriber-%d.\n" ANSI_COLOR_RESET, n, atoi(argv[4]));
         }
 
         //  Get subscriberB request and send to it the data
         if(FD_ISSET(atoi(argv[8]), &rfds)) {
-            HandleRequest(atoi(argv[7]), atoi(argv[8]), &Inferno, &Paradiso);
+            int n = HandleRequest(atoi(argv[7]), atoi(argv[8]), &Inferno, &Paradiso);
+            printf(ANSI_COLOR_RED "MEDIATOR: Sent %d bytes to Subscriber-%d.\n" ANSI_COLOR_RESET, n, atoi(argv[7]));
         }
 
         //  Get subscriberC request and send to it the data
         if(FD_ISSET(atoi(argv[11]), &rfds)) {
-            HandleRequest(atoi(argv[10]), atoi(argv[11]), &Inferno, &Paradiso);
+            int n = HandleRequest(atoi(argv[10]), atoi(argv[11]), &Inferno, &Paradiso);
+            printf(ANSI_COLOR_RED "MEDIATOR: Sent %d bytes to Subscriber-%d.\n" ANSI_COLOR_RESET, n, atoi(argv[10]));
         }
 
     }
@@ -142,9 +148,11 @@ int HandleRequest(pid_t subscriberPID, int subscriberReqPipe, Topic * inferno, T
     request = atoi(buffer);
 
     if(inferno->GetPublisherPID() == request)
-        inferno->SendData(subscriberPID);
+        return inferno->SendData(subscriberPID);
     else if(paradiso->GetPublisherPID() == request)
-        paradiso->SendData(subscriberPID);
-    else
+        return paradiso->SendData(subscriberPID);
+    else {
         printf(ANSI_COLOR_RED "MEDIATOR: Could not find any publisher with PID: %d.\n" ANSI_COLOR_RESET, request);
+        return -1;
+    }
 }
