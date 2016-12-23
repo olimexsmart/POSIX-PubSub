@@ -32,7 +32,7 @@ int main(int argc, char const *argv[]) {
         name of the launcher itself, 7 in total.
     */
     if(argc != 9) {
-        printf("The convention here is to use the first input argument as the mediator executable. Then the two publishers, the mediator and at the and the three subscribers, then followed by the two text file names.\n");
+        printf(ANSI_COLOR_YELLOW "The convention here is to use the first input argument as the mediator executable. Then the two publishers, the mediator and at the and the three subscribers, then followed by the two text file names.\n" ANSI_COLOR_RESET);
         return -1;
     }
 
@@ -78,8 +78,8 @@ int main(int argc, char const *argv[]) {
         then start the scheleton of the forking process
     */
 
-    printf("LAUNCHER: Names and pipes correctly processed. Starting fork processes\n");
-	printf("LAUNCHER: PID: %d\n", getpid());
+    printf(ANSI_COLOR_YELLOW "LAUNCHER: Names and pipes correctly processed. Starting fork processes\n" ANSI_COLOR_RESET);
+	printf(ANSI_COLOR_YELLOW "LAUNCHER: PID: %d\n" ANSI_COLOR_RESET, getpid());
 
     //  ------->    PublisherA forking
     publisherA = fork();
@@ -235,7 +235,7 @@ int main(int argc, char const *argv[]) {
         close(subscriberBReqPipe[1]);
         close(subscriberCReqPipe[1]);
 
-        printf(ANSI_COLOR_RED "MEDIATOR: Ready to execvp(%s).\n" ANSI_COLOR_RESET, mediatorName);
+        printf(ANSI_COLOR_RED "MEDIATOR: Ready to execvp.\n" ANSI_COLOR_RESET);
         execvp(mediatorName, arguments);
     }
 
@@ -243,6 +243,8 @@ int main(int argc, char const *argv[]) {
     int status;
     waitpid(publisherA, &status, 0);
     waitpid(publisherB, &status, 0);
+    printf(ANSI_COLOR_YELLOW "All Publishers exited, waiting one second and then killing the others.\n" ANSI_COLOR_RESET);
+    sleep(1);
     kill(subscriberA, SIGKILL);
     kill(subscriberB, SIGKILL);
     kill(subscriberC, SIGKILL);
@@ -253,6 +255,6 @@ int main(int argc, char const *argv[]) {
     // waitpid(mediator, &status, 0);
     //TODO: IF MEDIATOR FAILS, CLOSE ALL CHILDS
 
-    printf("LAUNCHER: All child processes terminated, exiting myself(%d).\n Should have been generated six files with the same content of the input ones.\n See you soon. \n", getpid());
+    printf(ANSI_COLOR_YELLOW "LAUNCHER: All child processes terminated, exiting myself(%d).\n Should have been generated six files with the same content of the input ones.\n See you soon. \n" ANSI_COLOR_RESET, getpid());
     return 0;
 }

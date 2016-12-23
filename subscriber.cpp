@@ -83,7 +83,7 @@ int main(int argc, char const *argv[]) {
         //  Take a breath
         struct timespec t, to;
         t.tv_sec = 0;
-        t.tv_nsec = (rand() % 75) * 1000000 + 1;
+        t.tv_nsec = (rand() % 5000) * 1000; //  Max five milliseconds
         nanosleep(&t, &to);
         nanosleep(&to, NULL); // In case the pause got interrupted
     }

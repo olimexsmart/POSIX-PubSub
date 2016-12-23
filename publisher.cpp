@@ -51,7 +51,7 @@ int main(int argc, char const *argv[]) {
 
         struct timespec t;
         t.tv_sec = 0;
-        t.tv_nsec = (rand() % 100) * 1000000 + 1;
+        t.tv_nsec = (rand() % 5000) * 1000; //  Max five milliseconds
         nanosleep(&t, NULL);
     }
 
