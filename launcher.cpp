@@ -243,10 +243,10 @@ int main(int argc, char const *argv[]) {
     int status;
     waitpid(publisherA, &status, 0);
     waitpid(publisherB, &status, 0);
-    printf(ANSI_COLOR_YELLOW "LAUNCHER: All Publishers exited, waiting 10 ms and then killing the others.\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_YELLOW "LAUNCHER: All Publishers exited, waiting 15 ms and then killing the others.\n" ANSI_COLOR_RESET);
     struct timespec t;
     t.tv_sec = 0;
-    t.tv_nsec = 10000000;   //  50 milliseconds
+    t.tv_nsec = 15000000;   //  50 milliseconds
     nanosleep(&t, NULL);
 
     kill(subscriberA, SIGKILL);
