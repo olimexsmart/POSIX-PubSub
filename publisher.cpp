@@ -49,6 +49,7 @@ int main(int argc, char const *argv[]) {
         int n = write(writingPipe, line, strlen(line));
         printf(ANSI_COLOR_GREEN "PUBLISHER-%d: Wrote %d characters.\n" ANSI_COLOR_RESET, getpid(), n);
 
+        //  Wait some random time assuming we have something to do
         struct timespec t;
         t.tv_sec = 0;
         t.tv_nsec = (rand() % 5000) * 1000; //  Max five milliseconds
@@ -56,9 +57,6 @@ int main(int argc, char const *argv[]) {
     }
 
     fclose(file);
-    // for(int i = 0; i < argc; i++)
-    //     free(argv[i]);
-    // free(argv);
 
     printf(ANSI_COLOR_GREEN "PUBLISHER-%d: Reached end of the file. Exiting.\n" ANSI_COLOR_RESET, getpid());
 

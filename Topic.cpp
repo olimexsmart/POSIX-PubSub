@@ -104,7 +104,7 @@ int Topic::SendData(pid_t subscriberPID)
             if(bytes != 0) {
                 //  Sending premble with the sender's PID
                 char senderPID[6] = "";
-                sprintf(senderPID, "%d", this->GetPublisherPID()); //  Special sign for segmentation
+                sprintf(senderPID, "%d", this->GetPublisherPID());
                 write(subscribers[k].GetFDResponse(), senderPID, 6);
                 //  Sending the actual data
                 write(subscribers[k].GetFDResponse(), buffer, bytes);
