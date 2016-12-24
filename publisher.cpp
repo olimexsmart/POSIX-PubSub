@@ -43,7 +43,7 @@ int main(int argc, char const *argv[]) {
     }
 
     //  Wait to other structures to become ready
-    sleep(3);
+    sleep(1);
 
     while (fgets(line, sizeof(line), file)) {
         int n = write(writingPipe, line, strlen(line));

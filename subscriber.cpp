@@ -71,7 +71,7 @@ int main(int argc, char const *argv[]) {
     gettimeofday(&time,NULL);
     srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
 
-    sleep(2); //Wait until mediator is ok
+    sleep(1); //Wait until mediator is ok
 
     //  Main loop
     printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Started sending requests.\n" ANSI_COLOR_RESET, getpid());
