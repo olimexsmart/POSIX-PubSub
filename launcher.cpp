@@ -243,12 +243,14 @@ int main(int argc, char const *argv[]) {
     int status;
     waitpid(publisherA, &status, 0);
     waitpid(publisherB, &status, 0);
+
     printf(ANSI_COLOR_YELLOW "LAUNCHER: All Publishers exited, waiting 15 ms and then killing the others.\n" ANSI_COLOR_RESET);
     struct timespec t;
     t.tv_sec = 0;
-    t.tv_nsec = 15000000;   //  50 milliseconds
+    t.tv_nsec = 15000000;   //  15 milliseconds
     nanosleep(&t, NULL);
 
+    //TODO publishers should exit by them self
     kill(subscriberA, SIGKILL);
     kill(subscriberB, SIGKILL);
     kill(subscriberC, SIGKILL);
@@ -257,7 +259,7 @@ int main(int argc, char const *argv[]) {
     // waitpid(subscriberB, &status, 0);
     // waitpid(subscriberC, &status, 0);
     // waitpid(mediator, &status, 0);
-    //TODO: IF MEDIATOR FAILS, CLOSE ALL CHILDS
+    //TODO: IF MEDIATOR FAILS, CLOSE ALL CHILDS AND CHECK FOR EXIT CODES
 
     printf(ANSI_COLOR_YELLOW "LAUNCHER: All child processes terminated, exiting myself(%d).\n Should have been generated six files with the same content of the input ones.\n See you soon. \n" ANSI_COLOR_RESET, getpid());
     return 0;

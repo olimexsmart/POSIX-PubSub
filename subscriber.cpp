@@ -27,9 +27,11 @@
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 void HandleSIGIO(int signal);
+//void HandleSIGSTOP(int signal);
 
 //  Some global vars used into the HandleSIGIO function
 int receiveFD;
+bool work = true;
 
 int main(int argc, char const *argv[]) {
 
@@ -65,6 +67,7 @@ int main(int argc, char const *argv[]) {
 
     //  IRQ attach
     signal(SIGIO, HandleSIGIO);
+    //signal(SIGSTOP, HandleSIGSTOP);
 
     //  More random seed
     struct timeval time;
@@ -75,7 +78,8 @@ int main(int argc, char const *argv[]) {
 
     //  Main loop
     printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Started sending requests.\n" ANSI_COLOR_RESET, getpid());
-    while (true) {
+
+    while (work) {
         sprintf(buffer, "%d", topics[rand() % Ntopics]);    //  Put request PID into the buffer
         int n = write(requestFD, buffer, 6);
         printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Sent request->%s to %s.\n" ANSI_COLOR_RESET, getpid(), (n == 6) ? "OK" : "FAILED", buffer);
@@ -88,14 +92,19 @@ int main(int argc, char const *argv[]) {
         nanosleep(&to, NULL); // In case the pause got interrupted
     }
 
+    //  Release things
     free(topics);
+    close(requestFD);
+    close(receiveFD);
 
+    printf(ANSI_COLOR_BLUE "SUBSCRIBER-%d: Exiting.\n" ANSI_COLOR_RESET, getpid());
     return 0;
 }
 
 
 void HandleSIGIO(int signal)
 {
+    if(signal != SIGIO) return;
     //  Block SIGIO until finished
     sigset_t sigset;
     sigemptyset(&sigset);
@@ -130,3 +139,8 @@ void HandleSIGIO(int signal)
     sigaddset(&sigset, SIGIO);
     sigprocmask(SIG_UNBLOCK, &sigset, NULL);
 }
+
+// void HandleSIGSTOP(int signal) {
+//     if(signal != SIGSTOP) return;
+//     work = false;
+// }

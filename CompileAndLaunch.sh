@@ -14,6 +14,7 @@ g++ subscriber.cpp -o subscriberC.o
 echo "SCRIPT: Subscribers compiled."
 
 echo "SCRIPT: Make sure that you have color enabled in your terminal!"
+echo "SCRIPT: Make also sure your CPU is not overloaded because some process might be neglected and the buffer might overflow"
 echo "SCRIPT: Launching in: (THIS WILL BE FAST, SOMETHING LIKE 6-7 SECONDS OF PURE MADNESS)"
 secs=$((5))
 while [ $secs -gt 0 ]; do

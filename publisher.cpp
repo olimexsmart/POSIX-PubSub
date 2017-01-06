@@ -56,7 +56,9 @@ int main(int argc, char const *argv[]) {
         nanosleep(&t, NULL);
     }
 
+    //  Release time
     fclose(file);
+    close(writingPipe);
 
     printf(ANSI_COLOR_GREEN "PUBLISHER-%d: Reached end of the file. Exiting.\n" ANSI_COLOR_RESET, getpid());
 

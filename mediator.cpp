@@ -24,6 +24,8 @@
 
 //  Very case-specific function to avoid code repetition and readbility
 int HandleRequest(pid_t subscriberPID, int subscriberReqPipe, Topic * inferno, Topic * paradiso);
+//  Handle stop request from launcher
+// void HandleSIGSTOP(int signal)
 
 
 int main(int argc, char const *argv[]) {
@@ -82,7 +84,8 @@ int main(int argc, char const *argv[]) {
         FD_SET(atoi(argv[11]), &rfds);
 
         printf(ANSI_COLOR_RED "MEDIATOR: Entering in select.\n" ANSI_COLOR_RESET);
-        select(nfds, &rfds, NULL, NULL, NULL);
+        if(select(nfds, &rfds, NULL, NULL, NULL) == -1)
+            perror(" Something has gone wrong with the select, we hope it's not that bad.\n");
         printf(ANSI_COLOR_RED "MEDIATOR: Some data received.\n" ANSI_COLOR_RESET);
 
         /*
@@ -131,9 +134,9 @@ int main(int argc, char const *argv[]) {
 
     }
 
-    // for(int i = 0; i < argc; i++)
-    //     free(argv[i]);
-    // free(argv);
+    //  Closing all pipes
+    for(int i = 0; i < argc; i++)
+        close(atoi(argv[11]));
 
     return 0;
 }
@@ -141,11 +144,18 @@ int main(int argc, char const *argv[]) {
 //  Very case-specific function to avoid code repetition and readbility
 int HandleRequest(pid_t subscriberPID, int subscriberReqPipe, Topic * inferno, Topic * paradiso)
 {
-    //  Getting Topic's PID
+    //  Getting Topic's PID, 6 because PIDs at max can be 30000
     char buffer[6] = "";
     pid_t request;
-    read(subscriberReqPipe, buffer, 6);
-    request = atoi(buffer);
+    if(read(subscriberReqPipe, buffer, 6) != 6) {
+        printf("Received bad request. Empting pipe.\n");
+        char * empty = (char *) malloc(sizeof(char) * 1024);
+        read(subscriberReqPipe, empty, 1024);
+        free(empty);
+        return -1;
+    }
+
+    request = atoi(buffer); //  Transforming request into PID
 
     if(inferno->GetPublisherPID() == request)
         return inferno->SendData(subscriberPID);
